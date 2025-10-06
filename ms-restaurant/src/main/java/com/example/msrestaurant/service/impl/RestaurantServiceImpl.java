@@ -10,6 +10,7 @@ import com.example.msrestaurant.service.abstraction.RestaurantService;
 import com.example.msrestaurant.util.CacheUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.example.RestaurantEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ import static lombok.AccessLevel.PRIVATE;
 public class RestaurantServiceImpl implements RestaurantService {
     RestaurantRepository restaurantRepository;
     CacheUtil cacheUtil;
-    KafkaTemplate<String, RestaurantEntity> kafkaTemplate;
+    KafkaTemplate<String, RestaurantEvent> kafkaTemplate;
 
     @Override
     public RestaurantResponse createRestaurant(CreateRestaurantRequest request) {
@@ -40,7 +41,12 @@ public class RestaurantServiceImpl implements RestaurantService {
 
         cacheUtil.saveToCache(getKey(restaurant.getId()), restaurant, 10L, MINUTES);
 
-        kafkaTemplate.send("restaurant-topic", restaurant.getId().toString(), restaurant);
+        RestaurantEvent build = RestaurantEvent.builder()
+                .name(restaurant.getRestaurantName())
+                .address(restaurant.getAddress())
+                .build();
+
+        kafkaTemplate.send("restaurant-topic", build);
 
         return RESTAURANT_MAPPER.buildRestaurantResponse(restaurant);
     }
@@ -114,7 +120,12 @@ public class RestaurantServiceImpl implements RestaurantService {
         cacheUtil.saveToCache(getKey(restaurant.getId()), restaurant, 10L, MINUTES);
         cacheUtil.deleteFromCache("RESTAURANTS:ALL");
 
-        kafkaTemplate.send("restaurant-updates", restaurant.getId().toString(), restaurant);
+        RestaurantEvent build = RestaurantEvent.builder()
+                .name(restaurant.getRestaurantName())
+                .address(restaurant.getAddress())
+                .build();
+
+        kafkaTemplate.send("restaurant-topic", build);
 
         return RESTAURANT_MAPPER.buildRestaurantResponse(restaurant);
     }
@@ -132,7 +143,12 @@ public class RestaurantServiceImpl implements RestaurantService {
         cacheUtil.deleteFromCache(getKey(id));
         cacheUtil.deleteFromCache("RESTAURANTS:ALL");
 
-        kafkaTemplate.send("restaurant-deletes", restaurant.getId().toString(), restaurant);
+        RestaurantEvent build = RestaurantEvent.builder()
+                .name(restaurant.getRestaurantName())
+                .address(restaurant.getAddress())
+                .build();
+
+        kafkaTemplate.send("restaurant-topic", build);
     }
 
     private RestaurantEntity fetchRestaurantIfExist(Long id) {

@@ -1,4 +1,4 @@
-rootProject.name = 'restoran-system'
+rootProject.name = 'system-restoran'
 
 include 'kafka-common'
 include 'ms-restaurant'

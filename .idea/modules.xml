@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kafka-common/restoran-system.kafka-common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/kafka-common/restoran-system.kafka-common.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ms-menu/restoran-system.ms-menu.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ms-menu/restoran-system.ms-menu.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ms-notification/restoran-system.ms-notification.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ms-notification/restoran-system.ms-notification.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ms-restaurant/restoran-system.ms-restaurant.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ms-restaurant/restoran-system.ms-restaurant.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kafka-common/system-restoran.kafka-common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/kafka-common/system-restoran.kafka-common.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ms-menu/system-restoran.ms-menu.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ms-menu/system-restoran.ms-menu.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ms-notification/system-restoran.ms-notification.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ms-notification/system-restoran.ms-notification.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ms-restaurant/system-restoran.ms-restaurant.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ms-restaurant/system-restoran.ms-restaurant.main.iml" />
     </modules>
   </component>
 </project>

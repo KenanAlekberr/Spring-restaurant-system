@@ -53,6 +53,8 @@ dependencies {
 	// Postgresql
 	runtimeOnly 'org.postgresql:postgresql'
 
+	implementation project(':kafka-common')
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

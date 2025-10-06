@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/${DB_NAME}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: redis
+    password: password
     driver-class-name: org.postgresql.Driver
   liquibase:
     change-log: classpath:liquibase/changelog-master.yml
@@ -13,6 +13,11 @@ spring:
     show-sql: true
   kafka:
     bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    template:
+      default-topic: restaurant-topic
   profiles:
     active: local
 
