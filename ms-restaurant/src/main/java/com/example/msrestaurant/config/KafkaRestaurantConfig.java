@@ -1,6 +1,6 @@
 package com.example.msrestaurant.config;
 
-import com.example.msrestaurant.dao.entity.RestaurantEntity;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.example.RestaurantEvent;
 import org.springframework.context.annotation.Bean;
@@ -13,25 +13,21 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.kafka.clients.producer.ProducerConfig.BOOTSTRAP_SERVERS_CONFIG;
-import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
-import static org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG;
-import static org.springframework.kafka.support.serializer.JsonSerializer.ADD_TYPE_INFO_HEADERS;
-
 @Configuration
 public class KafkaRestaurantConfig {
     @Bean
-    public ProducerFactory<String, RestaurantEvent> restaurantFactory() {
+    public ProducerFactory<String, RestaurantEvent> producerFactory() {
         Map<String, Object> config = new HashMap<>();
-        config.put(BOOTSTRAP_SERVERS_CONFIG, System.getenv().getOrDefault("SPRING_KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"));
-        config.put(KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        config.put(VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        config.put(ADD_TYPE_INFO_HEADERS, false);
+
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+
         return new DefaultKafkaProducerFactory<>(config);
     }
 
     @Bean
     public KafkaTemplate<String, RestaurantEvent> kafkaTemplate() {
-        return new KafkaTemplate<>(restaurantFactory());
+        return new KafkaTemplate<>(producerFactory());
     }
 }
