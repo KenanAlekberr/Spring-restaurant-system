@@ -1,15 +1,5 @@
 package com.example.msnotification.kafka;
 
-//import org.apache.kafka.common.serialization.StringDeserializer;
-//import org.apache.kafka.clients.consumer.ConsumerConfig;
-//import org.example.RestaurantEvent;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-//import org.springframework.kafka.core.ConsumerFactory;
-//import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-//import org.springframework.kafka.support.serializer.JsonDeserializer;
-
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.example.RestaurantEvent;
