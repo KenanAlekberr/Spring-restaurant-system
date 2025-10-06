@@ -1,0 +1,21 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    change-log: classpath:liquibase/changelog-master.yml
+  jpa:
+    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+  profiles:
+    active: local
+
+redis:
+  server:
+    url: redis://localhost:6379

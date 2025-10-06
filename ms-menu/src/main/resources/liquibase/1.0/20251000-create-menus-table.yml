@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20251000
+      author: Kənan Ələkbərov
+      changes:
+        - createTable:
+            tableName: menus
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: restaurant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: price
+                  type: NUMERIC(10, 2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: menu_status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValue: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true

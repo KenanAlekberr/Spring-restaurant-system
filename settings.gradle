@@ -1,0 +1,6 @@
+rootProject.name = 'restoran-system'
+
+include 'kafka-common'
+include 'ms-restaurant'
+include 'ms-menu'
+include 'ms-notification'
