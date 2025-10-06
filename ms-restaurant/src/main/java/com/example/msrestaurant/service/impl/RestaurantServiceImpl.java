@@ -10,6 +10,7 @@ import com.example.msrestaurant.service.abstraction.RestaurantService;
 import com.example.msrestaurant.util.CacheUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.example.RestaurantEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import static lombok.AccessLevel.PRIVATE;
 @Service
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@Slf4j
 public class RestaurantServiceImpl implements RestaurantService {
     RestaurantRepository restaurantRepository;
     CacheUtil cacheUtil;
@@ -41,12 +43,10 @@ public class RestaurantServiceImpl implements RestaurantService {
 
         cacheUtil.saveToCache(getKey(restaurant.getId()), restaurant, 10L, MINUTES);
 
-        RestaurantEvent build = RestaurantEvent.builder()
-                .name(restaurant.getRestaurantName())
-                .address(restaurant.getAddress())
-                .build();
-
-        kafkaTemplate.send("restaurant-topic", build);
+        RestaurantEvent event = fetchRestaurantEvent(restaurant);
+        log.info("SEND TO KAFKA");
+        kafkaTemplate.send("restaurant-topic", event);
+        log.info("SEND TO KAFKA");
 
         return RESTAURANT_MAPPER.buildRestaurantResponse(restaurant);
     }
@@ -120,12 +120,8 @@ public class RestaurantServiceImpl implements RestaurantService {
         cacheUtil.saveToCache(getKey(restaurant.getId()), restaurant, 10L, MINUTES);
         cacheUtil.deleteFromCache("RESTAURANTS:ALL");
 
-        RestaurantEvent build = RestaurantEvent.builder()
-                .name(restaurant.getRestaurantName())
-                .address(restaurant.getAddress())
-                .build();
-
-        kafkaTemplate.send("restaurant-topic", build);
+        RestaurantEvent event = fetchRestaurantEvent(restaurant);
+        kafkaTemplate.send("restaurant-topic", event);
 
         return RESTAURANT_MAPPER.buildRestaurantResponse(restaurant);
     }
@@ -143,17 +139,20 @@ public class RestaurantServiceImpl implements RestaurantService {
         cacheUtil.deleteFromCache(getKey(id));
         cacheUtil.deleteFromCache("RESTAURANTS:ALL");
 
-        RestaurantEvent build = RestaurantEvent.builder()
-                .name(restaurant.getRestaurantName())
-                .address(restaurant.getAddress())
-                .build();
-
-        kafkaTemplate.send("restaurant-topic", build);
+        RestaurantEvent event = fetchRestaurantEvent(restaurant);
+        kafkaTemplate.send("restaurant-topic", event);
     }
 
     private RestaurantEntity fetchRestaurantIfExist(Long id) {
         return restaurantRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(RESTAURANT_NOT_FOUND.getCode(), RESTAURANT_NOT_FOUND.getMessage()));
+    }
+
+    private RestaurantEvent fetchRestaurantEvent(RestaurantEntity restaurant) {
+        return RestaurantEvent.builder()
+                .name(restaurant.getRestaurantName())
+                .address(restaurant.getAddress())
+                .build();
     }
 
     private String getKey(Long id) {

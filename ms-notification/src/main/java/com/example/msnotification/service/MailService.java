@@ -22,11 +22,11 @@ public class MailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Restaurant Notifaction");
-        message.setText("Salam,"+name+ " adli restarant "+address+" da acildi");
+        message.setSubject("Restaurant Notification");
+        message.setText("Hello, a restaurant named " + name + " has opened. Address: " + address);
 
         mailSender.send(message);
-
         log.info("MailService.sendMail.end to={}, name={}, address={}", to, name, address);
+
     }
 }

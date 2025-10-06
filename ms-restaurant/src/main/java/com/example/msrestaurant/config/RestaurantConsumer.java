@@ -1,21 +1,19 @@
-package com.example.msrestaurant.service.impl;
+package com.example.msrestaurant.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.RestaurantEvent;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import static lombok.AccessLevel.PRIVATE;
 
-@Service
-@RequiredArgsConstructor
+@Component
 @FieldDefaults(level = PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class RestaurantConsumer {
     KafkaTemplate<String, RestaurantEvent> kafkaTemplate;
 
-    @KafkaListener(topics = "restaurant-topic", groupId = "restaurant-group")
     public void consume(RestaurantEvent event) {
         System.out.println("✅ A message came from Kafka.: ");
         kafkaTemplate.send("restaurant-topic", event);

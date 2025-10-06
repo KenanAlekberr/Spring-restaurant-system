@@ -20,7 +20,7 @@ public class RestaurantEventConsumer {
     @KafkaListener(topics = "restaurant-topic", groupId = "restaurant-group")
     public void consume(RestaurantEvent event) {
         log.info("mail sending -> {}", event);
-        mailService.sendMail("ibrahimnebizade2@gmail.com", event.getName(), event.getAddress());
+        mailService.sendMail("kenan.elekberov.02@gmail.com", event.getName(), event.getAddress());
         log.info("mail sent {}", event.getName());
     }
 }
