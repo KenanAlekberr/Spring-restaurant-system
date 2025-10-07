@@ -7,14 +7,12 @@ import com.example.msmenu.dao.repository.MenuRepository;
 import com.example.msmenu.dto.client.payment.request.OrderRequest;
 import com.example.msmenu.dto.client.payment.request.PaymentRequest;
 import com.example.msmenu.dto.client.payment.response.PaymentResponse;
-import com.example.msmenu.dto.client.restaurant.RestaurantResponse;
 import com.example.msmenu.dto.request.CreateMenuRequest;
 import com.example.msmenu.dto.request.UpdateMenuRequest;
 import com.example.msmenu.dto.response.MenuResponse;
 import com.example.msmenu.exception.custom.NotFoundException;
 import com.example.msmenu.service.abstraction.MenuService;
 import com.example.msmenu.util.CacheUtil;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
@@ -44,11 +42,9 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public MenuResponse createMenu(CreateMenuRequest request) {
-        RestaurantResponse restaurantResponse;
-
         try {
-            restaurantResponse = restaurantClient.getRestaurantById(request.getRestaurantId());
-        } catch (FeignException.NotFound ex) {
+            restaurantClient.getRestaurantById(request.getRestaurantId());
+        } catch (NotFoundException ex) {
             throw new NotFoundException(RESTAURANT_NOT_FOUND.getCode(),
                     "Customer not found with id: " + request.getRestaurantId());
         }
