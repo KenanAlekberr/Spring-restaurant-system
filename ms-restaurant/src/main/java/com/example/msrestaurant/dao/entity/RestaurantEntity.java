@@ -15,7 +15,6 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import static jakarta.persistence.EnumType.STRING;
@@ -30,7 +29,7 @@ import static lombok.AccessLevel.PRIVATE;
 @Table(name = "restaurants")
 @FieldDefaults(level = PRIVATE)
 @Builder
-public class RestaurantEntity implements Serializable {
+public class RestaurantEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     Long id;

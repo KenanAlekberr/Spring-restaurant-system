@@ -41,7 +41,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
         cacheUtil.saveToCache(getKey(restaurant.getId()), restaurant, 10L, MINUTES);
 
-        RestaurantEvent event = fetchRestaurantEvent(restaurant);
+        RestaurantEvent event = RESTAURANT_MAPPER.buildRestaurantEvent(restaurant);
         kafkaTemplate.send("restaurant-topic", event);
 
         return RESTAURANT_MAPPER.buildRestaurantResponse(restaurant);
@@ -52,21 +52,14 @@ public class RestaurantServiceImpl implements RestaurantService {
         RestaurantEntity cachedRestaurant = cacheUtil.getBucket(getKey(id));
 
         if (cachedRestaurant != null) {
-            if (cachedRestaurant.getRestaurantStatus() != DELETED) {
-                System.out.println("🔴 Read from Redis!");
+            if (cachedRestaurant.getRestaurantStatus() != DELETED)
                 return RESTAURANT_MAPPER.buildRestaurantResponse(cachedRestaurant);
-            } else {
-                throw new NotFoundException(RESTAURANT_NOT_FOUND.getCode(), RESTAURANT_NOT_FOUND.getMessage());
-            }
+            else throw new NotFoundException(RESTAURANT_NOT_FOUND.getCode(), RESTAURANT_NOT_FOUND.getMessage());
         }
 
         RestaurantEntity restaurant = fetchRestaurantIfExist(id);
 
-        if (restaurant.getRestaurantStatus() == DELETED)
-            throw new NotFoundException(RESTAURANT_NOT_FOUND.getCode(), RESTAURANT_NOT_FOUND.getMessage());
-
         cacheUtil.saveToCache(getKey(restaurant.getId()), restaurant, 10L, MINUTES);
-        System.out.println("🟢 Read from DB and written to Redis!");
 
         return RESTAURANT_MAPPER.buildRestaurantResponse(restaurant);
     }
@@ -77,10 +70,8 @@ public class RestaurantServiceImpl implements RestaurantService {
         List<RestaurantResponse> responses = new ArrayList<>();
 
         if (cachedRestaurants != null && !cachedRestaurants.isEmpty()) {
-            System.out.println("🔴 Read ALL from Redis!");
-
             for (RestaurantEntity restaurant : cachedRestaurants) {
-                if (restaurant.getRestaurantStatus() == ACTIVE || restaurant.getRestaurantStatus() == IN_PROGRESS)
+                if (restaurant.getRestaurantStatus() != DELETED)
                     responses.add(RESTAURANT_MAPPER.buildRestaurantResponse(restaurant));
             }
 
@@ -98,7 +89,6 @@ public class RestaurantServiceImpl implements RestaurantService {
         }
 
         cacheUtil.saveToCache("RESTAURANTS:ALL", activeRestaurants, 10L, MINUTES);
-        System.out.println("🟢 Read ALL from DB and written to Redis!");
 
         return responses;
     }
@@ -107,17 +97,10 @@ public class RestaurantServiceImpl implements RestaurantService {
     public RestaurantResponse updateRestaurant(Long id, UpdateRestaurantRequest request) {
         RestaurantEntity restaurant = fetchRestaurantIfExist(id);
 
-        if (restaurant.getRestaurantStatus() == DELETED)
-            throw new NotFoundException(RESTAURANT_NOT_FOUND.getCode(), RESTAURANT_NOT_FOUND.getMessage());
-
         RESTAURANT_MAPPER.updateRestaurant(restaurant, request);
         restaurantRepository.save(restaurant);
 
         cacheUtil.saveToCache(getKey(restaurant.getId()), restaurant, 10L, MINUTES);
-        cacheUtil.deleteFromCache("RESTAURANTS:ALL");
-
-        RestaurantEvent event = fetchRestaurantEvent(restaurant);
-        kafkaTemplate.send("restaurant-topic", event);
 
         return RESTAURANT_MAPPER.buildRestaurantResponse(restaurant);
     }
@@ -126,29 +109,15 @@ public class RestaurantServiceImpl implements RestaurantService {
     public void deleteRestaurant(Long id) {
         RestaurantEntity restaurant = fetchRestaurantIfExist(id);
 
-        if (restaurant.getRestaurantStatus() == DELETED)
-            throw new NotFoundException(RESTAURANT_NOT_FOUND.getCode(), RESTAURANT_NOT_FOUND.getMessage());
-
         restaurant.setRestaurantStatus(DELETED);
         restaurantRepository.save(restaurant);
 
         cacheUtil.deleteFromCache(getKey(id));
-        cacheUtil.deleteFromCache("RESTAURANTS:ALL");
-
-        RestaurantEvent event = fetchRestaurantEvent(restaurant);
-        kafkaTemplate.send("restaurant-topic", event);
     }
 
     private RestaurantEntity fetchRestaurantIfExist(Long id) {
-        return restaurantRepository.findById(id)
+        return restaurantRepository.findByIdAndStatusIn(id, List.of(ACTIVE, IN_PROGRESS))
                 .orElseThrow(() -> new NotFoundException(RESTAURANT_NOT_FOUND.getCode(), RESTAURANT_NOT_FOUND.getMessage()));
-    }
-
-    private RestaurantEvent fetchRestaurantEvent(RestaurantEntity restaurant) {
-        return RestaurantEvent.builder()
-                .name(restaurant.getRestaurantName())
-                .address(restaurant.getAddress())
-                .build();
     }
 
     private String getKey(Long id) {

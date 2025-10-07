@@ -19,6 +19,6 @@ public class CreateRestaurantRequest {
     String restaurantName;
 
     @NotBlank(message = "Restaurant address cannot be empty")
-    @Size(min = 2, max = 50, message = "Restaurant address length must be between 2 and 100")
+    @Size(min = 2, max = 100, message = "Restaurant address length must be between 2 and 100")
     String address;
 }

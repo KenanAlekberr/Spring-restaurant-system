@@ -28,7 +28,7 @@ public class ErrorHandler {
     @ResponseStatus(NOT_FOUND)
     public ErrorResponse handle(NotFoundException exception) {
         log.error("NotFoundException, ", exception);
-        return new ErrorResponse(RESTAURANT_NOT_FOUND.getCode(), RESTAURANT_NOT_FOUND.getMessage());
+        return new ErrorResponse(exception.getCode(), exception.getMessage());
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)

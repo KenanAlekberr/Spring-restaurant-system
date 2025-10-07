@@ -16,6 +16,6 @@ public class UpdateRestaurantRequest {
     @Size(min = 2, max = 50, message = "Restaurant name length must be between 2 and 50")
     String restaurantName;
 
-    @Size(min = 2, max = 50, message = "Restaurant address length must be between 2 and 100")
+    @Size(min = 2, max = 100, message = "Restaurant address length must be between 2 and 100")
     String address;
 }

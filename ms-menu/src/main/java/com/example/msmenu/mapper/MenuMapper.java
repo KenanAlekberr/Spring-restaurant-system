@@ -21,7 +21,6 @@ public enum MenuMapper {
                 .productName(request.getProductName())
                 .price(request.getPrice())
                 .menuStatus(ACTIVE)
-                .createdAt(LocalDateTime.now())
                 .build();
     }
 

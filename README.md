@@ -29,7 +29,7 @@ ___
 - Restoranlara aid menyuların idarə olunması
 - CRUD əməliyyatları
 - Feign Client — ms-restaurant servisinə REST çağırışları edir (restoran ID-ni yoxlamaq üçün)
-- Caching və Redis ilə performans artırılır
+- Tətbiqin performansını daha da artırmaq məqsədilə keş (cache) mexanizmi üçün Redis istifadə olunur
 - Liquibase inteqrasiyası
 - External Payment Integration — ayrıca deploy olunmuş “Payment & Order” sistemindən ödəniş prosesi çağırılır
 - Dockerized
