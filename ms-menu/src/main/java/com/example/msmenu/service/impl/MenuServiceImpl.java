@@ -66,21 +66,15 @@ public class MenuServiceImpl implements MenuService {
         MenuEntity cachedMenu = cacheUtil.getBucket(getKey(id));
 
         if (cachedMenu != null) {
-            if (cachedMenu.getMenuStatus() != DELETED) {
-                System.out.println("🔴 Read from Redis!");
+            if (cachedMenu.getMenuStatus() != DELETED)
                 return MENU_MAPPER.buildMenuResponse(cachedMenu);
-            } else {
+            else
                 throw new NotFoundException(MENU_NOT_FOUND.getCode(), MENU_NOT_FOUND.getMessage());
-            }
         }
 
         MenuEntity menuEntity = fetchMenuIfExist(id);
 
-        if (menuEntity.getMenuStatus() == DELETED)
-            throw new NotFoundException(MENU_NOT_FOUND.getCode(), MENU_NOT_FOUND.getMessage());
-
         cacheUtil.saveToCache(getKey(menuEntity.getId()), menuEntity, 10L, MINUTES);
-        System.out.println("🟢 Read from DB and written to Redis!");
 
         return MENU_MAPPER.buildMenuResponse(menuEntity);
     }
@@ -91,10 +85,8 @@ public class MenuServiceImpl implements MenuService {
         List<MenuResponse> cachedResponses = new ArrayList<>();
 
         if (cachedMenu != null && cachedMenu.isEmpty()) {
-            System.out.println("🔴 Read ALL from Redis!");
-
             for (MenuEntity menu : cachedMenu) {
-                if (menu.getMenuStatus() == ACTIVE || menu.getMenuStatus() == IN_PROGRESS)
+                if (menu.getMenuStatus() != DELETED)
                     cachedResponses.add(MENU_MAPPER.buildMenuResponse(menu));
             }
 
@@ -105,7 +97,7 @@ public class MenuServiceImpl implements MenuService {
         List<MenuResponse> menuResponses = new ArrayList<>();
 
         for (MenuEntity menuEntity : menuEntities) {
-            if (menuEntity.getMenuStatus() == ACTIVE || menuEntity.getMenuStatus() == IN_PROGRESS)
+            if (menuEntity.getMenuStatus() != DELETED)
                 menuResponses.add(MENU_MAPPER.buildMenuResponse(menuEntity));
         }
 
@@ -116,14 +108,10 @@ public class MenuServiceImpl implements MenuService {
     public MenuResponse updateMenu(Long id, UpdateMenuRequest request) {
         MenuEntity menuEntity = fetchMenuIfExist(id);
 
-        if (menuEntity.getMenuStatus() == DELETED)
-            throw new NotFoundException(MENU_NOT_FOUND.getCode(), MENU_NOT_FOUND.getMessage());
-
         MENU_MAPPER.updateMenu(menuEntity, request);
         menuRepository.save(menuEntity);
 
         cacheUtil.saveToCache(getKey(menuEntity.getId()), menuEntity, 10L, MINUTES);
-        cacheUtil.deleteFromCache("RESTAURANTS:ALL");
 
         return MENU_MAPPER.buildMenuResponse(menuEntity);
     }
@@ -132,14 +120,10 @@ public class MenuServiceImpl implements MenuService {
     public void deleteMenu(Long id) {
         MenuEntity menuEntity = fetchMenuIfExist(id);
 
-        if (menuEntity.getMenuStatus() == DELETED)
-            throw new NotFoundException(MENU_NOT_FOUND.getCode(), MENU_NOT_FOUND.getMessage());
-
         menuEntity.setMenuStatus(DELETED);
         menuRepository.save(menuEntity);
 
         cacheUtil.deleteFromCache(getKey(id));
-        cacheUtil.deleteFromCache("RESTAURANTS:ALL");
     }
 
     @Override
@@ -164,7 +148,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     private MenuEntity fetchMenuIfExist(Long id) {
-        return menuRepository.findById(id)
+        return menuRepository.findByIdAndStatusIn(id, List.of(ACTIVE, IN_PROGRESS))
                 .orElseThrow(() -> new NotFoundException(MENU_NOT_FOUND.getCode(), MENU_NOT_FOUND.getMessage()));
     }
 

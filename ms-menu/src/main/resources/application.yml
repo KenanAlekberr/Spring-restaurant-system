@@ -15,6 +15,7 @@ server:
 client:
   urls:
     ms-restaurant: http://localhost:8081
+    ms-payment: https://payment-texnoera.onrender.com/v1/payments
 
 redis:
   server:
