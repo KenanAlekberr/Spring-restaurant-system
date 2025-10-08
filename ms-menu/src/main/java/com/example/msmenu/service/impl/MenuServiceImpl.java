@@ -21,9 +21,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.msmenu.enums.MenuStatus.ACTIVE;
 import static com.example.msmenu.enums.MenuStatus.DELETED;
-import static com.example.msmenu.enums.MenuStatus.IN_PROGRESS;
 import static com.example.msmenu.exception.ExceptionConstants.MENU_NOT_FOUND;
 import static com.example.msmenu.exception.ExceptionConstants.RESTAURANT_NOT_FOUND;
 import static com.example.msmenu.mapper.MenuMapper.MENU_MAPPER;
@@ -108,6 +106,7 @@ public class MenuServiceImpl implements MenuService {
         menuRepository.save(menuEntity);
 
         cacheUtil.saveToCache(getKey(menuEntity.getId()), menuEntity, 10L, MINUTES);
+        cacheUtil.deleteFromCache("MENUS:ALL");
 
         return MENU_MAPPER.buildMenuResponse(menuEntity);
     }
@@ -120,6 +119,7 @@ public class MenuServiceImpl implements MenuService {
         menuRepository.save(menuEntity);
 
         cacheUtil.deleteFromCache(getKey(id));
+        cacheUtil.deleteFromCache("MENUS:ALL");
     }
 
     @Override
@@ -144,7 +144,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     private MenuEntity fetchMenuIfExist(Long id) {
-        return menuRepository.findByIdAndStatusIn(id, List.of(ACTIVE, IN_PROGRESS))
+        return menuRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(MENU_NOT_FOUND.getCode(), MENU_NOT_FOUND.getMessage()));
     }
 

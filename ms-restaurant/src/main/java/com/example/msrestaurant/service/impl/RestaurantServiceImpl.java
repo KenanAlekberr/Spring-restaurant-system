@@ -101,6 +101,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         restaurantRepository.save(restaurant);
 
         cacheUtil.saveToCache(getKey(restaurant.getId()), restaurant, 10L, MINUTES);
+        cacheUtil.deleteFromCache("RESTAURANTS:ALL");
 
         return RESTAURANT_MAPPER.buildRestaurantResponse(restaurant);
     }
@@ -113,10 +114,11 @@ public class RestaurantServiceImpl implements RestaurantService {
         restaurantRepository.save(restaurant);
 
         cacheUtil.deleteFromCache(getKey(id));
+        cacheUtil.deleteFromCache("RESTAURANTS:ALL");
     }
 
     private RestaurantEntity fetchRestaurantIfExist(Long id) {
-        return restaurantRepository.findByIdAndStatusIn(id, List.of(ACTIVE, IN_PROGRESS))
+        return restaurantRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(RESTAURANT_NOT_FOUND.getCode(), RESTAURANT_NOT_FOUND.getMessage()));
     }
 
